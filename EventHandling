@@ -1,0 +1,125 @@
+#include <iostream> 
+#include <GL/glut.h> 
+#include <iostream> 
+
+const int WINDOW_WIDTH = 800;
+const int WINDOW_HEIGHT = 600;
+
+bool keyPressed[5] = { false, false, false, false, false };
+
+
+void drawRect(int x, int y, int width, int height, float r, float g, float b) {
+    glColor3f(r, g, b);
+    glBegin(GL_QUADS);
+    glVertex2i(x, y);
+    glVertex2i(x + width, y);
+    glVertex2i(x + width, y + height);
+    glVertex2i(x, y + height);
+    glEnd();
+}
+
+void drawScreenSplit() {
+
+    glBegin(GL_POLYGON);
+    glColor3f(0.2f, 0.2f, 0.2f);
+    glVertex2i(0, 0);
+    glVertex2i(300, 0);
+    glVertex2i(300, 600);
+    glVertex2i(0, 600);
+    glEnd();
+
+    glBegin(GL_POLYGON);
+    glColor3f(0.9f, 0.9f, 0.9f);
+    glVertex2i(300, 0);
+    glVertex2i(800, 0);
+    glVertex2i(800, 600);
+    glVertex2i(300, 600);
+    glEnd();
+}
+
+
+void drawSteeringWheel() {
+    glColor3f(0.1f, 0.1f, 0.1f);
+    glBegin(GL_POLYGON);
+    glVertex2i(610, 300);
+    glVertex2i(602, 330);
+    glVertex2i(580, 352);
+    glVertex2i(550, 360);
+    glVertex2i(520, 352);
+    glVertex2i(498, 330);
+    glVertex2i(490, 300);
+    glVertex2i(498, 270);
+    glVertex2i(520, 248);
+    glVertex2i(550, 240);
+    glVertex2i(580, 248);
+    glVertex2i(602, 270);
+    glEnd();
+}
+
+void display() {
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    drawScreenSplit();
+
+    drawRect(50, 470, 200, 40, 0.2f, 0.2f, 0.2f);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glRasterPos2i(70, 485);
+    const char* leftLabel = "User Dashboard";
+    for (int i = 0; leftLabel[i] != '\0'; i++)
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, leftLabel[i]);
+
+    glColor3f(0.0f, 0.0f, 0.0f);
+    glRasterPos2i(480, 410);
+    const char* rightLabel = "Car Management System";
+    for (int i = 0; rightLabel[i] != '\0'; i++)
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, rightLabel[i]);
+
+
+    drawSteeringWheel();
+
+    char keys[5] = { 'A', 'B', 'C', 'D', 'E' };
+    for (int i = 0; i < 5; ++i) {
+        int x = 300 + 100 + i * 70;
+        int y = 100;
+        drawRect(x, y, 60, 40,
+            keyPressed[i] ? 0.0f : 0.5f,
+            keyPressed[i] ? 1.0f : 0.5f,
+            keyPressed[i] ? 0.0f : 0.5f);
+
+        glColor3f(0.0f, 0.0f, 0.0f);
+        glRasterPos2i(x + 20, y + 12);
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, keys[i]);
+    }
+
+
+    glutSwapBuffers();
+}
+
+void handleKey(unsigned char key, int x, int y) {
+    if (key >= 'A' && key <= 'E') {
+        int index = key - 'A';
+        keyPressed[index] = !keyPressed[index];
+        glutPostRedisplay();
+    }
+}
+
+
+void init() {
+    glMatrixMode(GL_PROJECTION);
+    gluOrtho2D(0, WINDOW_WIDTH, 0, WINDOW_HEIGHT);
+
+}
+
+int main(int argc, char** argv) {
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+    glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+    glutCreateWindow("Car Dashboard");
+
+    init();
+    glutDisplayFunc(display);
+    glutKeyboardFunc(handleKey);
+
+    glutMainLoop();
+    return 0;
+}
